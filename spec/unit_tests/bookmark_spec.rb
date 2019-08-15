@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'bookmark'
-require 'pg'
-require 'database_helpers'
 
 describe Bookmark do
   let(:bookmark) { double('bookmark', url: 'http://www.testbookmark.com', title: 'Test Bookmark') }
@@ -28,19 +26,10 @@ describe Bookmark do
 
   describe '.create' do
     it 'creates a new bookmark' do
-      # bookmark = Bookmark.create('http://www.testbookmark.com', 'Test Bookmark')
-      # persisted_data = persisted_data(bookmark.id)
-
       Bookmark.create(bookmark.url, bookmark.title)
-      connection = PG.connect(dbname: 'bookmark_manager_test')
-      results = connection.exec('SELECT * FROM bookmarks;')
+      results = get_table('bookmarks')
       expect(results[0]['url']).to eq bookmark.url
       expect(results[0]['title']).to eq bookmark.title
-
-      # expect(bookmark).to be_a Bookmark
-      # expect(bookmark.id).to eq persisted_data(bookmark.id)['id']
-      # expect(bookmark.title).to eq 'Test Bookmark'
-      # expect(bookmark.url).to eq 'http://www.testbookmark.com'
     end
   end
 

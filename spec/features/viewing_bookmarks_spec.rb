@@ -8,9 +8,7 @@ feature 'Viewing bookmarks' do
     visit('/')
     expect(page).to have_content 'Bookmark Manager'
   end
-end
 
-feature 'viewing bookmarks' do
   scenario 'view bookmarks list' do
     Bookmark.create('http://www.google.com', 'Google')
     Bookmark.create('http://www.lwlies.com', 'Little White Lies')
