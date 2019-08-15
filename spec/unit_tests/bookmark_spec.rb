@@ -43,4 +43,25 @@ describe Bookmark do
       expect(table_after).not_to include(first_bookmark)
     end
   end
+
+  describe '::update' do
+    it 'updates a bookmark' do
+      add_2_bookmarks
+      table_before = get_table('bookmarks').to_a
+      first_bookmark = table_before.first
+      Bookmark.update(
+        first_bookmark['id'],
+        title: "Amazon",
+        url: "www.amazon.co.uk"
+      )
+      table_after = get_table('bookmarks').to_a
+      expect(table_after).to include(
+         {
+          'id' => first_bookmark['id'],
+          'title' => 'Amazon',
+          'url' => "www.amazon.co.uk"
+        }
+      )
+    end
+  end
 end

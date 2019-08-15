@@ -12,7 +12,7 @@ class Bookmark
   end
 
   def self.all
-    connection = select_env
+    connection = select_db
 
     result = connection.exec('SELECT * FROM bookmarks;')
     bookmarks = []
@@ -23,9 +23,7 @@ class Bookmark
   end
 
   def self.create(url, title)
-    return false unless is_url?(url)
-
-    connection = select_env
+    connection = select_db
 
     result = connection.exec("INSERT INTO bookmarks (title, url) VALUES('#{title}', '#{url}') RETURNING id, url, title")
     # Bookmark.new(result[0]['id'], result[0]['title'], result[0]['url'])
@@ -33,21 +31,22 @@ class Bookmark
   end
 
   def self.delete(id)
-    connection = select_env
-    connection.exec("DELETE FROM bookmarks WHERE id = '#{id}'")
-  end
+    connection = select_db
 
-  def self.is_url?(url)
-    url
+    connection.exec("DELETE FROM bookmarks WHERE id = '#{id}'")
   end
 
   private
 
-  def self.select_env
-    if ENV['ENVIRONMENT'] == 'test'
-      PG.connect(dbname: 'bookmark_manager_test')
-    else
-      PG.connect(dbname: 'bookmark_manager')
-    end
+  def self.select_db
+    env_is_test? ? connect('bookmark_manager_test') : connect('bookmark_manager')
+  end
+
+  def self.connect(db)
+    PG.connect(dbname: db)
+  end
+
+  def self.env_is_test? 
+    ENV['ENVIRONMENT'] == 'test'
   end
 end
