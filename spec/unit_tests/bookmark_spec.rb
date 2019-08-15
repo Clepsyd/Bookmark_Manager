@@ -5,7 +5,7 @@ require 'bookmark'
 describe Bookmark do
   let(:bookmark) { double('bookmark', url: 'http://www.testbookmark.com', title: 'Test Bookmark') }
 
-  describe '.all' do
+  describe '::all' do
     it 'returns a list of bookmarks' do
       # connection = PG.connect(dbname: 'bookmark_manager_test')
       # connection.exec("INSERT INTO bookmarks (title, url) VALUES('Google')
@@ -24,7 +24,7 @@ describe Bookmark do
     end
   end
 
-  describe '.create' do
+  describe '::create' do
     it 'creates a new bookmark' do
       Bookmark.create(bookmark.url, bookmark.title)
       results = get_table('bookmarks')
@@ -33,17 +33,14 @@ describe Bookmark do
     end
   end
 
-  describe '.delete' do
+  describe '::delete' do
     it 'deletes a bookmark' do
-
-      Bookmark.create(bookmark.url, bookmark.title)
-      Bookmark.delete(bookmark.title)
-
-      connection = PG.connect(dbname: 'bookmark_manager_test')
-      results = connection.exec('SELECT * FROM bookmarks;')
-
-      expect(results.to_a).to be_empty
-      
+      add_2_bookmarks
+      table_before = get_table('bookmarks').to_a
+      first_bookmark = table_before.first
+      Bookmark.delete(first_bookmark['id'])
+      table_after = get_table('bookmarks').to_a
+      expect(table_after).not_to include(first_bookmark)
     end
   end
 end

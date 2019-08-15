@@ -4,6 +4,9 @@
       <a href="<%= bookmark.url %>">
         <%= bookmark.title %>
       </a>
+      <form action="/bookmarks/<%= bookmark.id %>", method="delete">
+        <input type="submit" value="Delete" id="<%= bookmark.title %>">
+      </form>
     </li>
   <% end %>
 </ul>
