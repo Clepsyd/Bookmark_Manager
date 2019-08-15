@@ -51,8 +51,8 @@ describe Bookmark do
       first_bookmark = table_before.first
       Bookmark.update(
         first_bookmark['id'],
-        title: "Amazon",
-        url: "www.amazon.co.uk"
+        "Amazon",
+        "www.amazon.co.uk"
       )
       table_after = get_table('bookmarks').to_a
       expect(table_after).to include(
@@ -62,6 +62,16 @@ describe Bookmark do
           'url' => "www.amazon.co.uk"
         }
       )
+    end
+  end
+
+  describe '::find' do
+    it 'return a bookmark object from an id' do
+      add_2_bookmarks
+      table = get_table('bookmarks')
+      first_bookmark = table.first
+      expect(Bookmark.find(first_bookmark['id']).title).to eq first_bookmark['title']
+      expect(Bookmark.find(first_bookmark['id']).url).to eq first_bookmark['url']
     end
   end
 end

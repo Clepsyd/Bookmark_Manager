@@ -13,7 +13,6 @@ class Bookmark
 
   def self.all
     connection = select_db
-
     result = connection.exec('SELECT * FROM bookmarks;')
     bookmarks = []
     result.each do |bookmark|
@@ -24,16 +23,33 @@ class Bookmark
 
   def self.create(url, title)
     connection = select_db
-
-    result = connection.exec("INSERT INTO bookmarks (title, url) VALUES('#{title}', '#{url}') RETURNING id, url, title")
+    result = connection.exec(
+      "INSERT INTO bookmarks (title, url)
+      VALUES('#{title}', '#{url}')
+      RETURNING id, url, title"
+    )
     # Bookmark.new(result[0]['id'], result[0]['title'], result[0]['url'])
     result
   end
 
   def self.delete(id)
     connection = select_db
-
     connection.exec("DELETE FROM bookmarks WHERE id = '#{id}'")
+  end
+
+  def self.update(id, title, url)
+    connection = select_db
+    connection.exec(
+      "UPDATE bookmarks
+      SET title = '#{title}', url = '#{url}'
+      WHERE id = #{id}"
+    )
+  end
+
+  def self.find(id)
+    connection = select_db
+    result = connection.exec("SELECT * FROM bookmarks WHERE id = #{id}").first
+    return Bookmark.new(result['id'], result['title'], result['url'])
   end
 
   private
