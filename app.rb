@@ -2,6 +2,7 @@
 
 require 'sinatra/base'
 require './lib/bookmark'
+require './database_connection_setup'
 
 class BookmarkManager < Sinatra::Base
   set :method_override, true

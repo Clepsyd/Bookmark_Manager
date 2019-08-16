@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pg'
+require 'database_connection'
 
 class Bookmark
   attr_reader :id, :title, :url
@@ -12,18 +13,20 @@ class Bookmark
   end
 
   def self.all
-    connection = select_db
-    result = connection.exec('SELECT * FROM bookmarks;')
+    result = DatabaseConnection.query('SELECT * FROM bookmarks;')
     bookmarks = []
     result.each do |bookmark|
-      bookmarks << Bookmark.new(bookmark['id'], bookmark['title'], bookmark['url'])
+      bookmarks << Bookmark.new(
+        bookmark['id'],
+        bookmark['title'],
+        bookmark['url']
+      )
     end
     bookmarks
   end
 
   def self.create(url, title)
-    connection = select_db
-    result = connection.exec(
+    result = DatabaseConnection.query(
       "INSERT INTO bookmarks (title, url)
       VALUES('#{title}', '#{url}')
       RETURNING id, url, title"
@@ -33,13 +36,11 @@ class Bookmark
   end
 
   def self.delete(id)
-    connection = select_db
-    connection.exec("DELETE FROM bookmarks WHERE id = '#{id}'")
+    DatabaseConnection.query("DELETE FROM bookmarks WHERE id = '#{id}';")
   end
 
   def self.update(id, title, url)
-    connection = select_db
-    connection.exec(
+    DatabaseConnection.query(
       "UPDATE bookmarks
       SET title = '#{title}', url = '#{url}'
       WHERE id = #{id}"
@@ -47,22 +48,8 @@ class Bookmark
   end
 
   def self.find(id)
-    connection = select_db
-    result = connection.exec("SELECT * FROM bookmarks WHERE id = #{id}").first
+    result = DatabaseConnection.query("SELECT * FROM bookmarks WHERE id = #{id}").first
     return Bookmark.new(result['id'], result['title'], result['url'])
   end
 
-  private
-
-  def self.select_db
-    env_is_test? ? connect('bookmark_manager_test') : connect('bookmark_manager')
-  end
-
-  def self.connect(db)
-    PG.connect(dbname: db)
-  end
-
-  def self.env_is_test? 
-    ENV['ENVIRONMENT'] == 'test'
-  end
 end
